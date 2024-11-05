@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Voting App</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Arial', sans-serif;
+      color: #333;
+    }
+
+    .container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+
+    .button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .button.yes {
+      background-color: #28a745;
+    }
+
+    .button.yes:hover {
+      background-color: #218838;
+    }
+
+    .button.no {
+      background-color: #dc3545;
+    }
+
+    .button.no:hover {
+      background-color: #c82333;
+    }
+
+    .results {
+      margin-top: 25px;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .results p {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .count {
+      font-size: 24px;
+      color: #333;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Setujukah Anda Jika Gaji Karyawan Dinaikan?</h1>
+
+  <div class="buttons">
+    <button id="yesBtn" class="button yes">Yes</button>
+    <button id="noBtn" class="button no">No</button>
+  </div>
+
+  <div class="results">
+    <p>Hasil Voting:</p>
+    <div>
+      <span>Yes: </span><span id="yesCount" class="count">0</span>
+    </div>
+    <div>
+      <span>No: </span><span id="noCount" class="count">0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAT9S-HvIrF8vbydTknXEP-JQbbZeS3lIM",
+    authDomain: "tugas-dec67.firebaseapp.com",
+    databaseURL: "https://tugas-dec67-default-rtdb.firebaseio.com",
+    projectId: "tugas-dec67",
+    storageBucket: "tugas-dec67.firebasestorage.app",
+    messagingSenderId: "975118293233",
+    appId: "1:975118293233:web:284e0c29af0ec74d69f150"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database(app);
+
+  // Database references
+  const yesRef = database.ref('votes/yes');
+  const noRef = database.ref('votes/no');
+
+  // Initial fetch of data
+  function updateCounts() {
+    yesRef.get().then(snapshot => {
+      document.getElementById("yesCount").innerText = snapshot.val() || 0;
+    });
+    noRef.get().then(snapshot => {
+      document.getElementById("noCount").innerText = snapshot.val() || 0;
+    });
+  }
+
+  // Increment vote counts
+  document.getElementById("yesBtn").addEventListener("click", () => {
+    yesRef.transaction(count => (count || 0) + 1).catch(error => console.error("Error updating Yes count:", error));
+  });
+
+  document.getElementById("noBtn").addEventListener("click", () => {
+    noRef.transaction(count => (count || 0) + 1).catch(error => console.error("Error updating No count:", error));
+  });
+
+  // Real-time listener for count updates
+  yesRef.on('value', snapshot => {
+    document.getElementById("yesCount").innerText = snapshot.val() || 0;
+  });
+  noRef.on('value', snapshot => {
+    document.getElementById("noCount").innerText = snapshot.val() || 0;
+  });
+
+  // Update counts on load
+  updateCounts();
+</script>
+
+</body>
+</html>
